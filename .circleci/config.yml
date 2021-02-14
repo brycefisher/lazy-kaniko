@@ -1,0 +1,15 @@
+version: 2.1
+
+jobs:
+  build_and_publish_image:
+    docker:
+      - image: docker:20.10.3-dind
+    steps:
+      - checkout
+      - run: |
+          echo "Got here"
+  
+workflows:
+  github_push:
+    jobs:
+      - build_and_publish_image
