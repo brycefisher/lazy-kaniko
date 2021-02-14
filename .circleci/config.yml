@@ -4,13 +4,14 @@ jobs:
   build_and_publish_image:
     docker:
       - image: docker:20.10.3-dind
+        auth:
+          username: brycefisherfleig
+          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - run: |
-          apk add --no-cache git curl
-          curl -vsSLO https://github.com/stefanwalther/docker-image-tag/releases/download/v0.1.10/docker-image-tag_0.1.10_Linux_x86_64.tar.gz
-          tar xvfz docker-image-tag_0.1.10_Linux_x86_64.tar.gz
-          ls -lah
+          docker build . -t brycefisher/lazy-kaniko:latest # TODO - replace with better tag!
+          docker push brycefisher/lazy-kaniko:latest
 
 workflows:
   github_push:
