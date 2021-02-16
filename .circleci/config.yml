@@ -13,8 +13,8 @@ jobs:
           version: 20.10.2
       - run: |
           docker login -u brycefisherfleig -p $DOCKERHUB_PASSWORD
-          docker build . -t brycefisher/lazy-kaniko:latest # TODO - replace with better tag!
-          docker push brycefisher/lazy-kaniko:latest
+          docker build . -t brycefisherfleig/lazy-kaniko:latest # TODO - replace with better tag!
+          docker push brycefisherfleig/lazy-kaniko:latest
 
 workflows:
   github_push:
