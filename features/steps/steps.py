@@ -14,3 +14,9 @@ def step_impl(context, build_name):
 @when(u'Dockerfile and build context are passed to lazy-kaniko')
 def step_impl(context):
     context.lazy_kaniko = LazyKanikoRun(registry=context.registry, build=context.build)
+
+
+@then(u'the new image exists in the docker registry')
+def step_impl(context):
+    from features.helpers.docker import client
+    client.images.get("localhost:5000/simple")

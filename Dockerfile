@@ -11,3 +11,7 @@ RUN curl -sSLo - https://github.com/dpc/docker-source-checksum/releases/download
     && rm -rf docker-source-checksum-v0.2.0-x86_64-unknown-linux-musl/
 
 COPY --from=gcr.io/kaniko-project/executor:debug /kaniko/executor /usr/bin/kaniko
+
+COPY entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT /entrypoint.sh

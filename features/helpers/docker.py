@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from textwrap import indent
 
 import docker
 
@@ -12,7 +13,7 @@ class Registry:
 
     def __init__(self):
         self.name = "registry"
-        self._container = client.containers.run(self.image, name=self.name, detach=True)
+        self._container = client.containers.run(self.image, name=self.name, ports={"5000/tcp": 5000}, detach=True)
 
     @property
     def address(self):
@@ -48,7 +49,11 @@ class LazyKanikoRun:
 
     def __post_init__(self):
         self.target_image = f"{self.registry.address}/{self.build.name}"
+        self._container = client.containers.create(self.sut_image_tag, environment=self.environment)
         self.execute()
+
+    def __del__(self):
+        self._container.remove(force=True)
 
     @property
     def sut_image_tag(self):
@@ -63,7 +68,15 @@ class LazyKanikoRun:
         }
 
     def execute(self):
-        self.execution = client.containers.run(self.sut_image_tag, environment=self.environment)
+        self._container.start()
+        self._result = self._container.wait(timeout=5)
+
+    def debug(self):
+        header = f"=====[ LOGS FROM {self._container.name} ({self.sut_image_tag}) ]====="
+        body = indent(self._container.logs().decode().strip(), " > ")
+        footer = "=" * len(header)
+        return "\n".join([header, body, footer])
+
 
 # THINGS NEEDED TO RUN THIS:
 #  - target image name
