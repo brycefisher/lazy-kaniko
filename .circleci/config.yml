@@ -4,9 +4,6 @@ jobs:
   build_and_publish_image:
     docker:
       - image: docker:20.10.3-dind
-        auth:
-          username: brycefisherfleig
-          password: $DOCKERHUB_PASSWORD
     steps:
       - checkout
       - setup_remote_docker:
@@ -14,6 +11,15 @@ jobs:
       - run: |
           docker login -u brycefisherfleig -p $DOCKERHUB_PASSWORD
           docker build . -t brycefisherfleig/lazy-kaniko:latest # TODO - replace with better tag!
+
+          apk add curl
+          curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 \
+              && chmod +x container-structure-test-linux-amd64 \
+              && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+          container-structure-test test \
+            --image brycefisherfleig/lazy-kaniko:latest \
+            --config docker-test.yaml
+
           docker push brycefisherfleig/lazy-kaniko:latest
 
 workflows:
