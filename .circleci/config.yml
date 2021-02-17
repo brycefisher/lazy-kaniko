@@ -2,12 +2,9 @@ version: 2.1
 
 jobs:
   build_and_publish_image:
-    docker:
-      - image: docker:20.10.2-dind
+    machine: true
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.2
       - run: |
           echo "Logging into Dockerhub"
           docker login -u brycefisherfleig -p $DOCKERHUB_PASSWORD
@@ -31,7 +28,7 @@ jobs:
             --config unittests.yaml
 
           echo "Running Integration Tests"
-          sh ./integration-tests.sh
+          sh ./integration-tests.sh  # TODO - pass "$TAG" to job
 
           echo "Pushing image to Docker Hub"
           docker push "$IMAGE"
