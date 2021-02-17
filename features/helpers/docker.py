@@ -82,6 +82,9 @@ class LazyKanikoRun:
         self._container.start()
         self._result = self._container.wait(timeout=30)
 
+    def logs(self):
+        return self._container.logs().decode().strip()
+
     @property
     def id(self):
         return self._container.id
@@ -89,7 +92,7 @@ class LazyKanikoRun:
     def debug(self):
         header = f"=====[ {self._container.name} ({self.sut_image_tag}) ]====="
         container_inspect = json.dumps(self._container.attrs, indent=4)
-        logs = indent(self._container.logs().decode().strip(), " > ")
+        logs = indent(self.logs(), " > ")
         footer = "=" * len(header)
         return "\n".join([header, container_inspect, logs, footer])
 

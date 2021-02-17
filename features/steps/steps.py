@@ -1,4 +1,5 @@
 from features.helpers.docker import DockerBuild, Registry, LazyKanikoRun
+from features.helpers.output import LogParser
 
 
 @given(u'an empty docker registry')
@@ -17,9 +18,11 @@ def step_impl(context):
     context.lazy_kaniko = LazyKanikoRun(registry=context.registry, build=context.build)
     context.network.connect(context.lazy_kaniko.id)
     context.lazy_kaniko.execute()
+    context.log_parser = LogParser(context.lazy_kaniko.logs())
 
 
 @then(u'the new image exists in the docker registry')
 def step_impl(context):
     from features.helpers.docker import client
-    client.images.get("localhost:5000/simple")
+    tag = context.log_parser.tag()
+    client.images.get(f"localhost:5000/simple:{tag}")
