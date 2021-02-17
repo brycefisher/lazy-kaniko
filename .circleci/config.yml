@@ -30,6 +30,9 @@ jobs:
             --image "$IMAGE" \
             --config unittests.yaml
 
+          echo "Running Integration Tests"
+          sh ./integration-tests.sh
+
           echo "Pushing image to Docker Hub"
           docker push "$IMAGE"
 
