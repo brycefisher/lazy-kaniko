@@ -4,5 +4,5 @@ Feature: Lazy Builds
     Given an empty docker registry
     And the Dockerfile and build context "simple"
     When Dockerfile and build context are passed to lazy-kaniko
-    Then lazy-kaniko builds a new "simple" image
-    And the new image exists in the docker registry
+    #Then lazy-kaniko builds a new "simple" image
+    Then the new image exists in the docker registry
