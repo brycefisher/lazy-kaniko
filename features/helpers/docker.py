@@ -21,6 +21,10 @@ class Registry:
     def address(self):
         return f"{self.name}:5000"
 
+    @property
+    def id(self):
+        return self._container.id
+
     def __del__(self):
         self._container.remove(force=True)
 
@@ -55,15 +59,12 @@ class LazyKanikoRun:
     def __post_init__(self):
         self.target_image = f"{self.registry.address}/{self.build.name}"
         self._container = client.containers.create(self.sut_image_tag, environment=self.environment, volumes=self.volumes())
-        self.execute()
 
     def __del__(self):
         self._container.remove(force=True)
 
     def volumes(self):
-        return [
-            self.build.context_mount(),
-        ]
+        return [self.build.context_mount()]
 
     @property
     def sut_image_tag(self):
@@ -81,6 +82,10 @@ class LazyKanikoRun:
         self._container.start()
         self._result = self._container.wait(timeout=30)
 
+    @property
+    def id(self):
+        return self._container.id
+
     def debug(self):
         header = f"=====[ {self._container.name} ({self.sut_image_tag}) ]====="
         container_inspect = json.dumps(self._container.attrs, indent=4)
@@ -89,12 +94,5 @@ class LazyKanikoRun:
         return "\n".join([header, container_inspect, logs, footer])
 
 
-# THINGS NEEDED TO RUN THIS:
-#  - target image name
-#  - Dockerfile
-#  - build context
-#
-# THINGS PROVIDED BY THIS IMAGE:
-#  - target image tag
-#  - output docker image
-#  - docker push
+def setup_networking():
+    return client.networks.create("lazy_kaniko_behave")

@@ -11,13 +11,15 @@
 function build_image() {
   local dockerfile="$1"
   local context="$2"
+  local target_image_tag="$3"
 
   echo "Need to build docker container"
   set -x
   kaniko \
     --dockerfile "$dockerfile" \
     --context "dir://$context" \
-    --no-push
+    --destination "$target_image_tag" \
+    --insecure
 }
 
 function calculate_checksum_tag() {
@@ -42,7 +44,7 @@ function main() {
   TARGET_IMAGE_TAG="$TARGET_IMAGE:$TAG"
   echo "Full target image + tag: ${TARGET_IMAGE_TAG}"
 
-  (docker-image-tag list "$TARGET_IMAGE" | grep "$TAG") || build_image "$DOCKERFILE" "$CONTEXT"
+  (docker-image-tag list "$TARGET_IMAGE" | grep "$TAG") || build_image "$DOCKERFILE" "$CONTEXT" "$TARGET_IMAGE_TAG"
 }
 
 main
