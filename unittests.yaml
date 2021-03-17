@@ -1,0 +1,11 @@
+schemaVersion: "2.0.0"
+
+commandTests:
+  - name: "docker-image-tag"
+    command: "which"
+    args: ["docker-image-tag"]
+    expectedOutput: ["/usr/bin/docker-image-tag"]
+  - name: "docker-source-checksum"
+    command: "which"
+    args: ["docker-source-checksum"]
+    expectedOutput: ["/usr/bin/docker-source-checksum"]

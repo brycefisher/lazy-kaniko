@@ -1,0 +1,6 @@
+venv/
+features/
+*.yaml
+.gitignore
+integration-tests.sh
+.circleci/
