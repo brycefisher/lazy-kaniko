@@ -13,13 +13,21 @@ class Registry:
 
     image = 'registry:2.7.1'
 
-    def __init__(self):
+    def __init__(self, local_port = 5000):
         self.name = "registry"
-        self._container = client.containers.run(self.image, name=self.name, ports={"5000/tcp": 5000}, detach=True)
+        self.local_port = local_port
+        self._container = client.containers.run(self.image,
+                                                name=self.name,
+                                                ports={"5000/tcp": local_port},
+                                                detach=True)
 
     @property
     def address(self):
-        return f"{self.name}:5000"
+        return f"{self.name}:{self.local_port}"
+
+    @property
+    def local_address(self):
+        return f"localhost:{self.local_port}"
 
     @property
     def id(self):
@@ -91,10 +99,9 @@ class LazyKanikoRun:
 
     def debug(self):
         header = f"=====[ {self._container.name} ({self.sut_image_tag}) ]====="
-        container_inspect = json.dumps(self._container.attrs, indent=4)
         logs = indent(self.logs(), " > ")
         footer = "=" * len(header)
-        return "\n".join([header, container_inspect, logs, footer])
+        return "\n".join([header, logs, footer])
 
 
 def setup_networking():

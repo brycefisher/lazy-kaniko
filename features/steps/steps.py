@@ -25,4 +25,6 @@ def step_impl(context):
 def step_impl(context):
     from features.helpers.docker import client
     tag = context.log_parser.tag()
-    client.images.get(f"localhost:5000/simple:{tag}")
+    image = context.build.name
+    registry = context.registry.local_address
+    client.images.get_registry_data(f"{registry}/{image}:{tag}")
