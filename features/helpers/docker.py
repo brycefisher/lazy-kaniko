@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from os.path import abspath
 from textwrap import indent
-import json
-
+import csv
 import docker
+import json
 
 client = docker.from_env()
 
@@ -54,6 +54,12 @@ class DockerBuild:
         container_path = "/workspace"
         host_path = abspath(self.build_context)
         return f"{host_path}:{container_path}:ro"
+
+    @property
+    def tag(self):
+        with open("features/builds/tags.json") as fd:
+            builds = json.load(fd)
+            return builds[self.name]
 
 @dataclass
 class LazyKanikoRun:

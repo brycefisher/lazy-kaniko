@@ -28,3 +28,20 @@ def step_impl(context):
     image = context.build.name
     registry = context.registry.local_address
     client.images.get_registry_data(f"{registry}/{image}:{tag}")
+
+
+@given(u'the docker registry already has the tag for the build')
+def step_impl(context):
+    # TODO - refactor this so there's a class /methods encapsulating more of this logic
+    from features.helpers.docker import client
+    tag = context.build.tag
+    image_name = context.build.name
+    registry = context.registry.local_address
+    img = client.images.pull(f"hello-world")
+    img.tag(f"{registry}/{image_name}:{tag}")
+    client.images.push(f"{registry}/{image_name}:{tag}")
+
+
+@then(u'lazy-kaniko logs that it skipped the build')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Then lazy-kaniko logs that it skipped the build')
