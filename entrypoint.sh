@@ -44,15 +44,10 @@ function main() {
   TARGET_IMAGE_TAG="$TARGET_IMAGE:$TAG"
   echo "Full target image + tag: ${TARGET_IMAGE_TAG}"
 
-  echo 'BEFORE TAG LIST:'
-  set -x
-  reggie "$TARGET_IMAGE" | grep "$TAG"
-  set +x
-  echo 'AFTER TAG LIST:'
   echo 'TODO add kaniko build && llogic here'
 
-  #(docker-image-tag list "$TARGET_IMAGE" | grep "$TAG" && echo 'Skipping build') \
-  #  || build_image "$DOCKERFILE" "$CONTEXT" "$TARGET_IMAGE_TAG"
+  (reggie "$TARGET_IMAGE" | grep "$TAG" | grep "$TAG" && echo 'Skipping build') \
+    || build_image "$DOCKERFILE" "$CONTEXT" "$TARGET_IMAGE_TAG"
 }
 
 main
