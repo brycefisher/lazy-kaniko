@@ -1,4 +1,11 @@
-FROM alpine:3.12
+FROM golang:1.17.5-alpine3.14 AS builder
+WORKDIR /go/src/app
+COPY reggie.go reggie.go
+COPY go.mod go.mod
+RUN go get -d -v ./...
+RUN go build reggie.go && ls -lah
+
+FROM alpine:3.15
 
 RUN apk add --no-cache curl
 
@@ -11,6 +18,7 @@ RUN curl -sSLo - https://github.com/dpc/docker-source-checksum/releases/download
     && rm -rf docker-source-checksum-v0.2.0-x86_64-unknown-linux-musl/
 
 COPY --from=gcr.io/kaniko-project/executor:debug /kaniko/executor /usr/bin/kaniko
+COPY --from=BUILDER /go/src/app/reggie /usr/bin/reggie
 
 COPY entrypoint.sh /entrypoint.sh
 
