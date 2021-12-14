@@ -34,7 +34,8 @@ class Registry:
         return self._container.id
 
     def __del__(self):
-        self._container.remove(force=True)
+        #self._container.remove(force=True)
+        pass
 
 
 class DockerBuild:

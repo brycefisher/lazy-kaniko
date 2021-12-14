@@ -14,3 +14,9 @@ class LogParser:
             if match:
                 return match.group("tag")
         raise ValueError("Unable to find tag in log lines")
+
+    def skipped_build(self) -> bool:
+        for line in self.logs.splitlines():
+            if 'Skipping build' in line:
+                return True
+        return False

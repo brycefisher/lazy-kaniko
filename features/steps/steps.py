@@ -44,4 +44,4 @@ def step_impl(context):
 
 @then(u'lazy-kaniko logs that it skipped the build')
 def step_impl(context):
-    raise NotImplementedError(u'STEP: Then lazy-kaniko logs that it skipped the build')
+    assert context.log_parser.skipped_build()
