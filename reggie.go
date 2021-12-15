@@ -16,9 +16,9 @@ type ImageTags struct {
 
 func main() {
   client, err := reggie.NewClient("http://registry:5000",
-    //reggie.WithUsernamePassword("myuser", "mypass"),  // registry credentials
-    reggie.WithDefaultName("simple"),           // default repo name
-    //reggie.WithDebug(true)
+    //reggie.WithUsernamePassword("myuser", "mypass")
+    reggie.WithDefaultName("simple"),
+    reggie.WithDebug(true),
   )
 
   if err != nil {

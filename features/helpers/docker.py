@@ -13,12 +13,23 @@ class Registry:
 
     image = 'registry:2.7.1'
 
-    def __init__(self, local_port = 5000):
+    def __init__(self, auth = False, local_port = 5000):
         self.name = "registry"
+        self._env = {}
+        self._volumes = {}
         self.local_port = local_port
+
+        if auth:
+            self._require_auth()
+
+        self._run()
+
+    def _run(self):
         self._container = client.containers.run(self.image,
                                                 name=self.name,
-                                                ports={"5000/tcp": local_port},
+                                                environment=self._env,
+                                                volumes=self._volumes,
+                                                ports={"5000/tcp": self.local_port},
                                                 detach=True)
 
     @property
@@ -32,6 +43,15 @@ class Registry:
     @property
     def id(self):
         return self._container.id
+
+    def _require_auth(self):
+        self._env['REGISTRY_AUTH'] = 'htpasswd'
+        self._env['REGISTRY_AUTH_HTPASSWD_REALM'] = 'Registry'
+        self._env['REGISTRY_AUTH_HTPASSWD_PATH'] = '/etc/docker/registry/htpasswd'
+        self._volumes['/home/bff/programming/lazy-kaniko/helpers/htpasswd'] = {
+            'bind': '/etc/docker/registry/htpasswd',
+            'mode': 'ro',
+        }
 
     def __del__(self):
         self._container.remove(force=True)

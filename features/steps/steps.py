@@ -8,6 +8,12 @@ def step_impl(context):
     context.network.connect(context.registry.id)
 
 
+@given(u'an empty authenticated docker registry')
+def step_impl(context):
+    context.registry = Registry(auth=True)
+    context.network.connect(context.registry.id)
+
+
 @given(u'the Dockerfile and build context "{build_name}"')
 def step_impl(context, build_name):
     context.build = DockerBuild(build_name)
