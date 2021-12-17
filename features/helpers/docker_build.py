@@ -1,4 +1,5 @@
 from os.path import abspath
+from typing import Optional
 import json
 
 
@@ -10,8 +11,9 @@ class DockerBuild:
      * Dockerfiles exist in `features/builds/{build_name}/Dockerfile`
     """
 
-    def __init__(self, build_name: str):
-        self.name = build_name
+    def __init__(self, build_name: str, image: str):
+        self.build_name = build_name
+        self.image = image
         self.build_context = f"features/builds/{build_name}/"
         # TODO -- check the build context and a Dockerfile within the build context all exist
 
@@ -24,7 +26,4 @@ class DockerBuild:
     def tag(self):
         with open("features/builds/tags.json") as fd:
             builds = json.load(fd)
-            return builds[self.name]
-
-
-
+            return builds[self.build_name]

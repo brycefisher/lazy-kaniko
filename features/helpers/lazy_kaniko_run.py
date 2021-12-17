@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from textwrap import indent
-from typing import Optional
+from typing import Optional, Union
 
 from . import LocalRegistry, DockerBuild
 
@@ -18,8 +18,12 @@ class LazyKanikoRun:
 
     def __post_init__(self):
         from . import client
-        self.target_image = f"{self.registry.address}/{self.build.name}"
-        self._container = client.containers.create(self.sut_image_tag, environment=self.environment, volumes=self.volumes())
+        self.target_image = f"{self.registry.address}/{self.build.image}"
+        self._container = client.containers.create(
+            self.sut_image_tag,
+            environment=self.environment,
+            volumes=self.volumes()
+        )
 
     def __del__(self):
         self._container.remove(force=True)
@@ -35,6 +39,9 @@ class LazyKanikoRun:
     def environment(self):
         return {
             "TARGET_IMAGE": self.target_image,
+            "REGISTRY_URL": self.registry.address,
+            "REGISTRY_USER": self.user,
+            "REGISTRY_PASS": self.password,
             "DOCKERFILE": "/workspace/Dockerfile",
             "CONTEXT": "/workspace/",
         }

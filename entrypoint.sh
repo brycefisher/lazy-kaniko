@@ -44,8 +44,6 @@ function main() {
   TARGET_IMAGE_TAG="$TARGET_IMAGE:$TAG"
   echo "Full target image + tag: ${TARGET_IMAGE_TAG}"
 
-  echo 'TODO add kaniko build && llogic here'
-
   (reggie "$TARGET_IMAGE" | grep "$TAG" | grep "$TAG" && echo 'Skipping build') \
     || build_image "$DOCKERFILE" "$CONTEXT" "$TARGET_IMAGE_TAG"
 }

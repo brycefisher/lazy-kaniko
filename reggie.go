@@ -15,9 +15,14 @@ type ImageTags struct {
 }
 
 func main() {
-  client, err := reggie.NewClient("http://registry:5000",
-    //reggie.WithUsernamePassword("myuser", "mypass")
-    reggie.WithDefaultName("simple"),
+  registry := os.Getenv("REGISTRY_URL")
+  user := os.Getenv("REGISTRY_USER")
+  pass := os.Getenv("REGISTRY_PASS")
+  target_image := os.Getenv("TARGET_IMAGE")
+
+  client, err := reggie.NewClient(registry,
+    reggie.WithUsernamePassword(user, pass),
+    reggie.WithDefaultName(target_image),
     reggie.WithDebug(true),
   )
 
