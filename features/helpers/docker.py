@@ -2,10 +2,9 @@ from dataclasses import dataclass
 from os.path import abspath
 from textwrap import indent
 import csv
-import docker
 import json
 
-client = docker.from_env()
+from . import client
 
 
 class Registry:
