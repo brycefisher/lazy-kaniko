@@ -1,61 +1,14 @@
 from dataclasses import dataclass
 from os.path import abspath
 from textwrap import indent
+from typing import Optional
 import csv
 import json
 
-from . import client
+from . import LocalRegistry
 
 
-class Registry:
-    """ Resource handle for ephemeral, test-specific docker registry """
-
-    image = 'registry:2.7.1'
-
-    def __init__(self, auth = False, local_port = 5000):
-        self.name = "registry"
-        self._env = {}
-        self._volumes = {}
-        self.local_port = local_port
-
-        if auth:
-            self._require_auth()
-
-        self._run()
-
-    def _run(self):
-        self._container = client.containers.run(self.image,
-                                                name=self.name,
-                                                environment=self._env,
-                                                volumes=self._volumes,
-                                                ports={"5000/tcp": self.local_port},
-                                                detach=True)
-
-    @property
-    def address(self):
-        return f"{self.name}:{self.local_port}"
-
-    @property
-    def local_address(self):
-        return f"localhost:{self.local_port}"
-
-    @property
-    def id(self):
-        return self._container.id
-
-    def _require_auth(self):
-        self._env['REGISTRY_AUTH'] = 'htpasswd'
-        self._env['REGISTRY_AUTH_HTPASSWD_REALM'] = 'Registry'
-        self._env['REGISTRY_AUTH_HTPASSWD_PATH'] = '/etc/docker/registry/htpasswd'
-        self._volumes['/home/bff/programming/lazy-kaniko/helpers/htpasswd'] = {
-            'bind': '/etc/docker/registry/htpasswd',
-            'mode': 'ro',
-        }
-
-    def __del__(self):
-        self._container.remove(force=True)
-
-
+# TODO - break into separate module
 class DockerBuild:
     """
     Test Case comprised of a Dockerfile and build context
@@ -80,16 +33,21 @@ class DockerBuild:
             builds = json.load(fd)
             return builds[self.name]
 
+
+# TODO - break into separate module
 @dataclass
 class LazyKanikoRun:
     """ Execution of System-Under-Test """
-    registry: Registry
+    registry: LocalRegistry
     build: DockerBuild
+    user: Optional[str] = None
+    password: Optional[str] = None
     sut_tag: str = "latest"
 
     image = "brycefisherfleig/lazy-kaniko"
 
     def __post_init__(self):
+        from . import client
         self.target_image = f"{self.registry.address}/{self.build.name}"
         self._container = client.containers.create(self.sut_image_tag, environment=self.environment, volumes=self.volumes())
 
@@ -130,4 +88,5 @@ class LazyKanikoRun:
 
 
 def setup_networking():
+    from . import client
     return client.networks.create("lazy_kaniko_behave")

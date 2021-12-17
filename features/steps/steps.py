@@ -1,10 +1,11 @@
-from features.helpers.docker import DockerBuild, Registry, LazyKanikoRun
+from features.helpers.docker import DockerBuild, LazyKanikoRun
+from features.helpers import LocalRegistry
 from features.helpers.output import LogParser
 
 
 @given(u'an empty docker registry')
 def step_impl(context):
-    context.registry = Registry()
+    context.registry = LocalRegistry()
     context.network.connect(context.registry.id)
 
 
@@ -19,6 +20,11 @@ def step_impl(context, build_name):
     context.build = DockerBuild(build_name)
 
 
+@given(u'valid authentication')
+def step_impl(context):
+    raise NotImplementedError()
+
+
 @when(u'Dockerfile and build context are passed to lazy-kaniko')
 def step_impl(context):
     context.lazy_kaniko = LazyKanikoRun(registry=context.registry, build=context.build)
@@ -29,7 +35,7 @@ def step_impl(context):
 
 @then(u'the new image exists in the docker registry')
 def step_impl(context):
-    from features.helpers.docker import client
+    from features.helpers import client
     tag = context.log_parser.tag()
     image = context.build.name
     registry = context.registry.local_address
@@ -39,7 +45,7 @@ def step_impl(context):
 @given(u'the docker registry already has the tag for the build')
 def step_impl(context):
     # TODO - refactor this so there's a class /methods encapsulating more of this logic
-    from features.helpers.docker import client
+    from features.helpers import client
     tag = context.build.tag
     image_name = context.build.name
     registry = context.registry.local_address
