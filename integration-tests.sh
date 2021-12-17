@@ -7,5 +7,7 @@ else
   source venv/bin/activate
 fi
 
+TAGS="${1:-~broken}"
+
 pip3 install -r features/requirements.txt
-behave features/
+behave -t $TAGS features/
