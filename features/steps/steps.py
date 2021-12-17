@@ -1,4 +1,4 @@
-from features.helpers import LocalRegistry, DockerBuild, LazyKanikoRun, RemoteRegistry
+from features.helpers import LocalRegistry, DockerBuild, LazyKanikoRun
 from features.helpers.output import LogParser
 
 
@@ -10,7 +10,8 @@ def step_impl(context):
 
 @given(u'an authenticated docker registry')
 def step_impl(context):
-    context.registry = RemoteRegistry.from_env()
+    context.registry = LocalRegistry(auth=True)
+    context.network.connect(context.registry.id)
 
 
 @given(u'the Dockerfile and build context "{build_name}" image "{image}"')
@@ -47,7 +48,7 @@ def step_impl(context):
     # TODO - refactor this so there's a class /methods encapsulating more of this logic
     from features.helpers import client
     tag = context.build.tag
-    image_name = context.build.name
+    image_name = context.build.image
     registry = context.registry.local_address
     img = client.images.pull(f"hello-world")
     img.tag(f"{registry}/{image_name}:{tag}")

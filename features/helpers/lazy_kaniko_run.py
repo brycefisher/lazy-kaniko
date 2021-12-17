@@ -18,7 +18,7 @@ class LazyKanikoRun:
 
     def __post_init__(self):
         from . import client
-        self.target_image = f"{self.registry.address}/{self.build.image}"
+        self.target_image = self.build.image
         self._container = client.containers.create(
             self.sut_image_tag,
             environment=self.environment,
@@ -37,14 +37,17 @@ class LazyKanikoRun:
 
     @property
     def environment(self):
-        return {
+        env = {
             "TARGET_IMAGE": self.target_image,
-            "REGISTRY_URL": self.registry.address,
-            "REGISTRY_USER": self.user,
-            "REGISTRY_PASS": self.password,
+            "REGISTRY_HOST": self.registry.address,
+            "REGISTRY_INSECURE": "yes",
             "DOCKERFILE": "/workspace/Dockerfile",
             "CONTEXT": "/workspace/",
         }
+        if self.registry.user and self.registry.password:
+            env["REGISTRY_USER"] = self.registry.user
+            env["REGISTRY_PASSWORD"] = self.registry.password
+        return env
 
     def execute(self):
         self._container.start()

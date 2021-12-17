@@ -3,10 +3,16 @@ package main
 
 import (
   "encoding/json"
+  "flag"
   "fmt"
   "os"
 
   "github.com/bloodorangeio/reggie"
+)
+
+var (
+  registry = flag.String("registry", "https://index.docker.io", "remote registry to list tags from")
+  target_image = flag.String("target_image", "", "image to scan for tags")
 )
 
 type ImageTags struct {
@@ -15,22 +21,30 @@ type ImageTags struct {
 }
 
 func main() {
-  registry := os.Getenv("REGISTRY_URL")
-  user := os.Getenv("REGISTRY_USER")
-  pass := os.Getenv("REGISTRY_PASS")
-  target_image := os.Getenv("TARGET_IMAGE")
+  flag.Parse()
 
-  client, err := reggie.NewClient(registry,
-    reggie.WithUsernamePassword(user, pass),
-    reggie.WithDefaultName(target_image),
+  // Optional
+  user := os.Getenv("REGISTRY_USER")
+  password := os.Getenv("REGISTRY_PASSWORD")
+
+  fmt.Printf("registry: %s\n", *registry)
+  fmt.Printf("target_image: %s\n", *target_image)
+
+  // Setup docker client
+  client, err := reggie.NewClient(*registry,
+    reggie.WithDefaultName(*target_image),
     reggie.WithDebug(true),
   )
-
   if err != nil {
-    fmt.Printf("Err making client: %v", err);
+    fmt.Printf("Err making client: %v\n", err);
     os.Exit(1)
   }
+  if user != "" && password != "" {
+    client.Config.Username = user
+    client.Config.Password = password
+  }
 
+  // Talk to Docker registry
   req := client.NewRequest(reggie.GET, "/v2/<name>/tags/list")
   resp, err := client.Do(req)
   if err != nil {

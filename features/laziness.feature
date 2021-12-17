@@ -6,10 +6,9 @@ Feature: Lazy Builds
     When Dockerfile and build context are passed to lazy-kaniko
     Then the new image exists in the docker registry
 
-  @broken
   Scenario: CI Builds And Pushes New Image to an Authenticated Registry
     Given an authenticated docker registry
-    And the Dockerfile and build context "simple" image "bff/0x50c/behave"
+    And the Dockerfile and build context "simple" image "simple"
     And valid authentication
     When Dockerfile and build context are passed to lazy-kaniko
     Then the new image exists in the docker registry
