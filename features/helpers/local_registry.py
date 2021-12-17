@@ -1,3 +1,8 @@
+from os.path import abspath
+
+HTPASSWD_CONTAINER_PATH = '/htpasswd'
+
+
 class LocalRegistry:
     """ Resource handle for ephemeral, test-specific docker registry """
 
@@ -6,10 +11,7 @@ class LocalRegistry:
     def __init__(self, auth = False, local_port = 5000):
         self.name = "registry"
         self._env = {}
-        self._volumes = {}
         self.local_port = local_port
-        if auth:
-            self._require_auth()
         self._run()
 
     def _run(self):
@@ -34,16 +36,3 @@ class LocalRegistry:
 
     def __del__(self):
         self._container.remove(force=True)
-
-    def _require_auth(self):
-        self._env['REGISTRY_AUTH'] = 'htpasswd'
-        self._env['REGISTRY_AUTH_HTPASSWD_REALM'] = 'Registry'
-        self._env['REGISTRY_AUTH_HTPASSWD_PATH'] = '/etc/docker/registry/htpasswd'
-        self._volumes['/home/bff/programming/lazy-kaniko/helpers/htpasswd'] = {
-            'bind': '/etc/docker/registry/htpasswd',
-            'mode': 'ro',
-        }
-
-    @property
-    def credentials(self):
-        return ('alice', 'A|z<46')
