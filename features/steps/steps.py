@@ -1,5 +1,5 @@
-from features.helpers.docker import DockerBuild, LazyKanikoRun
-from features.helpers import LocalRegistry
+from features.helpers.docker import LazyKanikoRun
+from features.helpers import LocalRegistry, DockerBuild
 from features.helpers.output import LogParser
 
 
