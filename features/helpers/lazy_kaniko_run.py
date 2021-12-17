@@ -5,7 +5,6 @@ from typing import Optional
 from . import LocalRegistry, DockerBuild
 
 
-# TODO - break into separate module
 @dataclass
 class LazyKanikoRun:
     """ Execution of System-Under-Test """
@@ -56,8 +55,3 @@ class LazyKanikoRun:
         logs = indent(self.logs(), " > ")
         footer = "=" * len(header)
         return "\n".join([header, logs, footer])
-
-
-def setup_networking():
-    from . import client
-    return client.networks.create("lazy_kaniko_behave")

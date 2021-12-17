@@ -1,5 +1,5 @@
 from behave.model_core import Status
-from features.helpers.docker import setup_networking
+from features.helpers import setup_networking
 
 
 def before_all(context):
