@@ -2,13 +2,36 @@ version: 2.1
 
 jobs:
   build_and_publish_image:
-    docker:
-      - image: docker:20.10.3-dind
+    machine: true
     steps:
       - checkout
       - run: |
-          echo "Got here"
-  
+          echo "Logging into Dockerhub"
+          docker login -u brycefisherfleig -p $DOCKERHUB_PASSWORD
+
+          echo "Building Docker Image"
+          if [[ "$CIRCLE_BRANCH" == "master" ]]; then
+            export TAG="latest"
+          else
+            export TAG="$CIRCLE_BRANCH"
+          fi
+          export IMAGE="brycefisherfleig/lazy-kaniko:$TAG"
+          docker build . -t "$IMAGE"
+
+          echo "Running Unit Tests"
+          curl -LO https://storage.googleapis.com/container-structure-test/latest/container-structure-test-linux-amd64 \
+              && chmod +x container-structure-test-linux-amd64 \
+              && mv container-structure-test-linux-amd64 /usr/local/bin/container-structure-test
+          container-structure-test test \
+            --image "$IMAGE" \
+            --config unittests.yaml
+
+          echo "Running Integration Tests"
+          sh ./integration-tests.sh  # TODO - pass "$TAG" to job
+
+          echo "Pushing image to Docker Hub"
+          docker push "$IMAGE"
+
 workflows:
   github_push:
     jobs:
